@@ -8,6 +8,13 @@ files = [
     "Brass_30V_285mA"
     "Steel_22V_203mA"
 ];
+plot_names = [
+    "Aluminum 25V 240mA"
+    "Aluminum 30V 290mA"
+    "Brass 25V 237mA"
+    "Brass 30V 285mA"
+    "Steel 22V 203mA"
+];
 
 % Thermocouple positions measured from x0 [m]
 x1 = 0.034925;
@@ -26,10 +33,12 @@ H_exp_list  = zeros(length(files),1);
 
 %% TEMPERATURE VS TIME
 figure(1)
-
+cd ASEN3802_HeatConduction_SP26
+cd ASEN3802_HeatConduction_FA25
 for i = 1:length(files)
 
     % Load dataset
+    
     data = readmatrix(files(i));
 
     % RemoveNaN values
@@ -83,7 +92,7 @@ for i = 1:length(files)
     T_std = std(couples(idx0:end,:), 0, 1);
 
     % Linear fit of temperatures
-    p = polyfit(x, T_avg, 1);
+    [p,S] = polyfit(x, T_avg, 1);
 
     H_exp = p(1);                 % Experimental slope
     T0_exp = polyval(p, 0);       % Temperature at x0
@@ -100,9 +109,13 @@ for i = 1:length(files)
     T0_exp_list(i) = T0_exp;
     H_exp_list(i)  = H_exp;
 
+    % Error bar calculation
+    [yfit, delta] = polyval(p, x, S);
+
     % Plot steady-state data with fit and analytical model
-    subplot(5,1,i)
-    errorbar(x, T_avg, T_std, 'o')
+    figure
+    %subplot(5,1,i)
+    errorbar(x, T_avg, delta, 'b')
     hold on
     plot(x, T_fit, '-')
     plot(x, T_an, '-')
@@ -115,11 +128,13 @@ for i = 1:length(files)
     y_margin = max(1, 0.05*y_range);
     ylim([y_min - y_margin, y_max + y_margin])
 
-    title(files(i) + " (Steady-state profile)")
+    title(plot_names(i) + " (Steady-state profile)")
     xlabel("x from x0 [m]")
     ylabel("Temp [C]")
-    legend("Experimental","Polyfit","Analytical","Location","southeast")
+    legend("Error Bar","Polyfit","Analytical","Location","southeast")
     grid on
+    % Save figure as png
+    saveas(gcf, [files{i}, '.png']);
 end
 
 %% RESULTS
@@ -130,3 +145,5 @@ for i = 1:length(files)
     fprintf("%-20s  %-10.3f  %-12.3f  %-12.3f\n", ...
         files(i), T0_exp_list(i), H_exp_list(i), H_an_vals(i));
 end
+cd ..
+cd ..

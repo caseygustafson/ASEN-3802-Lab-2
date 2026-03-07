@@ -1,0 +1,16 @@
+function [S] = sum_singlecase(T0,H,alpha,L,testcase,x)
+H = H(testcase);
+T0= T0(testcase);
+
+for j=1:8 %thermocouple #
+    for t=0:14400
+        for n=1:3 % sum runs
+            lambdan = (2*n-1)*pi/(2*L);
+            bn = (8*H*L*(-1)^n) / ((2*n-1)^2 * pi^2);
+            summ = 
+        end
+        u = T0 + H*x(j) + summ
+
+    end
+end
+

@@ -1,0 +1,21 @@
+function [u] = u_singlecase(T0,H,alpha,L,testcase,x,time)
+% This function calculates the temperature vs time for all thermocouples for a single test case
+
+H = H(testcase);
+T0= T0(testcase);
+alpha = alpha(testcase);
+for j=1:8 %thermocouple #
+    
+    for t=1:length(time)
+        summlast=0;
+        for n=1:3 % sum runs
+            lambdan = (2*n-1)*pi/(2*L);
+            bn = (8*H*L*(-1)^n) / ((2*n-1)^2 * pi^2);
+            summ = (   bn*sin(lambdan*x(j)) * exp(-(lambdan)^2*alpha*time(t))   )+summlast;
+            summlast = summ;
+        end
+        u(t,j) = T0 + H*x(j) + summ;
+
+    end
+end
+

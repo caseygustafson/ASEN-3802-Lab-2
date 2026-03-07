@@ -1,0 +1,107 @@
+
+clc;clear;close all;
+
+
+
+% test order Al25V_240ma, Al30V_290ma,Brass25V_237ma, Brass30V_285ma, Steel22V_203ma
+colors = ['b','g','r','c','m','y','w','k']; %used for plotting later on
+%% test properties
+cases = 5; % number of tests conducted
+V = [25,30,25,30,22]; %test voltages
+I = [0.24,0.29,0.237,0.285,0.203]; % test current
+
+%% thermocouple location vector
+x1 = 0.034925; % location of first thermocouple (m)
+dx = 0.0127; %spacing between thermocouples
+for a=1:8
+    x(a) = x1 + (a-1)*dx;
+end
+%% Material Properties
+L = 0.1492; %m, length of test section (same for all cases)
+k = [130,130,115,115,16.2]; %thermal conductivities for each test case
+cp = [960,960,380,380,500]; %cp for each test case
+rho = [2810,2810,8500,8500,8000]; %density for each test case
+D = 0.0254; % Diameter of test (same for all cases)
+
+%calculating alpha from material properties (for each test case)
+for i=1:cases
+    alpha(i)= k(i)/(rho(i)*cp(i));
+end
+%% other test properties (from Lab 2 part 1)
+T0 = [17.058,17.182,16.638,16.777,15.161];
+H = (4*I.*V) ./ (k*pi * D^2);
+
+%% PLOT TEST DATA (EXPERIMENTAL DATA)
+% This is slightly modified code from part 1
+
+% List of experimental data files
+files = [
+   "Aluminum_25V_240mA"
+   "Aluminum_30V_290mA"
+   "Brass_25V_237mA"
+   "Brass_30V_285mA"
+   "Steel_22V_203mA"
+];
+%Names of plots
+plotnames = [
+   "Aluminum 25V 240mA"
+   "Aluminum 30V 290mA"
+   "Brass 25V 237mA"
+   "Brass 30V 285mA"
+   "Steel 22V 203mA"
+];
+
+cd ASEN3802_HeatConduction_SP26\ASEN3802_HeatConduction_FA25
+for i = 1:length(files)
+   % Load dataset
+   data = readmatrix(files(i));
+   % RemoveNaN values
+   data = data(all(~isnan(data),2),:);
+   % Time and thermocouple temperatures
+   t(i).time = data(:,1); %saves the time vector into a structure so it isnt overwritten
+   couples = data(:,2:9);
+   % Plot thermocouple temperatures vs time
+   figure(i)
+   hold on;
+   for q=1:8
+   plot(t(i).time, couples(:,q),"Color",colors(q)) %plots experimental data as a solid line
+   
+   end
+   
+   title(plotnames(i) + " (Temperature of Thermocouples vs time)")
+   xlabel("Time [s]")
+   ylabel("Temp [C]")
+   grid on
+  
+   
+end
+
+%% CALC AND PLOT ANALYTICAL SOLUTION FOR EACH TEST CASE
+cd ..
+cd ..
+for z=1:cases % loops through all test cases
+u = u_singlecase(T0,H,alpha,L,z,x,t(z).time); %calculates u for a single test case
+U(z).u = u; % structure containing all analytical data so it isnt overwritten
+%Plot analytical for each case over the existing experimental data plots
+figure(z);
+    for i=1:8 %line for each thermocouple
+        plot(t(z).time,u(:,i),"Color",colors(i),"LineStyle", "--");
+        hold on
+    end
+% creating a legend that is easy to understand
+legend('TC 1','TC 2','TC 3','TC 4','TC 5','TC 6','TC 7','TC 8')
+annotation('textbox',[0.65 0.15 0.2 0.1], ...
+    'String',{'Solid = Experimental','Dashed = Analytical'}, ...
+    'EdgeColor','none');
+
+end
+
+%% Saving the plots as PNG
+
+
+for k = 1:cases
+    fig = figure(k);  % get figure handle
+    filename = sprintf('plot_%d.png', k);
+    saveas(fig, filename)
+end
+
