@@ -4,7 +4,17 @@ clc;clear;close all;
 
 
 % test order Al25V_240ma, Al30V_290ma,Brass25V_237ma, Brass30V_285ma, Steel22V_203ma
-colors = ['b','g','r','c','m','y','w','k']; %used for plotting later on
+%colors = ['b','g','r','c','m','g','orange','k']; %used for plotting later on
+colors = [
+    0.0000 0.4470 0.7410;   % Blue
+    0.8500 0.3250 0.0980;   % Orange
+    0.9290 0.6940 0.1250;   % Yellow
+    0.4940 0.1840 0.5560;   % Purple
+    0.4660 0.6740 0.1880;   % Green
+    0.3010 0.7450 0.9330;   % Cyan
+    0.6350 0.0780 0.1840;   % Red
+    0.5    0.5    0.5       % Gray
+];
 %% test properties
 cases = 5; % number of tests conducted
 V = [25,30,25,30,22]; %test voltages
@@ -64,7 +74,7 @@ for i = 1:length(files)
    figure(i)
    hold on;
    for q=1:8
-   plot(t(i).time, couples(:,q),"Color",colors(q)) %plots experimental data as a solid line
+   plot(t(i).time, couples(:,q),"Color",colors(q,:),"LineWidth",1.5) %plots experimental data as a solid line
    
    end
    
@@ -85,7 +95,7 @@ U(z).u = u; % structure containing all analytical data so it isnt overwritten
 %Plot analytical for each case over the existing experimental data plots
 figure(z);
     for i=1:8 %line for each thermocouple
-        plot(t(z).time,u(:,i),"Color",colors(i),"LineStyle", "--");
+        plot(t(z).time,u(:,i),"Color",colors(i,:),"LineStyle", "--","LineWidth",1.5);
         hold on
     end
 % creating a legend that is easy to understand
