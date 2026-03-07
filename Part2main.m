@@ -9,7 +9,7 @@ colors = ['b','g','r','c','m','y','w','k']; %used for plotting later on
 cases = 5; % number of tests conducted
 V = [25,30,25,30,22]; %test voltages
 I = [0.24,0.29,0.237,0.285,0.203]; % test current
-
+summation_number = 10; %number of summations in the analytical solution
 %% thermocouple location vector
 x1 = 0.034925; % location of first thermocouple (m)
 dx = 0.0127; %spacing between thermocouples
@@ -76,11 +76,11 @@ for i = 1:length(files)
    
 end
 
-%% CALC AND PLOT ANALYTICAL SOLUTION FOR EACH TEST CASE
+%% CALCULATE AND PLOT ANALYTICAL SOLUTION FOR EACH TEST CASE
 cd ..
 cd ..
 for z=1:cases % loops through all test cases
-u = u_singlecase(T0,H,alpha,L,z,x,t(z).time); %calculates u for a single test case
+u = u_singlecase(T0,H,alpha,L,z,x,t(z).time,summation_number); %calculates u for a single test case
 U(z).u = u; % structure containing all analytical data so it isnt overwritten
 %Plot analytical for each case over the existing experimental data plots
 figure(z);
@@ -89,8 +89,8 @@ figure(z);
         hold on
     end
 % creating a legend that is easy to understand
-legend('TC 1','TC 2','TC 3','TC 4','TC 5','TC 6','TC 7','TC 8')
-annotation('textbox',[0.65 0.15 0.2 0.1], ...
+legend('TC 1','TC 2','TC 3','TC 4','TC 5','TC 6','TC 7','TC 8','Location','northeastoutside')
+annotation('textbox',[0.8 0.2 0.2 0.1], ...
     'String',{'Solid = Experimental','Dashed = Analytical'}, ...
     'EdgeColor','none');
 
